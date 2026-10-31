@@ -13,6 +13,7 @@ export function Sidebar({
   onRunAll,
   onClose,
   running,
+  runCount,
   open,
 }: {
   enabled: Set<string>;
@@ -21,6 +22,7 @@ export function Sidebar({
   onRunAll: () => void;
   onClose: () => void;
   running: number;
+  runCount: number;
   open: boolean;
 }) {
   const [query, setQuery] = useState("");
@@ -136,9 +138,9 @@ export function Sidebar({
       </div>
 
       <div className="side-foot">
-        <button type="button" className="run-all" onClick={onRunAll} disabled={enabled.size === 0}>
+        <button type="button" className="run-all" onClick={onRunAll} disabled={runCount === 0}>
           <Zap size={14} />
-          {running > 0 ? `Running ${running}…` : `Run ${enabled.size} modules`}
+          {running > 0 ? `Running ${running}…` : `Run ${runCount} modules`}
         </button>
         <div className="side-foot-note">Keys stay in this browser. Nothing is logged server-side.</div>
       </div>

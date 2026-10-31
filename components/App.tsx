@@ -304,6 +304,7 @@ export function App() {
         enabled={enabled}
         open={sidebarOpen}
         running={running}
+        runCount={armed}
         onToggle={(id) =>
           setEnabled((prev) => {
             const next = new Set(prev);
