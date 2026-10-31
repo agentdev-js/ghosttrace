@@ -3,11 +3,11 @@ import type { Keys, KeyName } from "./types";
 const STORAGE_KEY = "ghosttrace.keys";
 
 export const KEY_META: { id: KeyName; label: string; hint: string; placeholder: string }[] = [
-  { id: "shodan", label: "Shodan", hint: "Host banners, open ports, vulns", placeholder: "Shodan API key" },
-  { id: "virustotal", label: "VirusTotal", hint: "Reputation and detections", placeholder: "VT API key" },
-  { id: "hibp", label: "Have I Been Pwned", hint: "Breach lookup by email", placeholder: "HIBP API key" },
-  { id: "hunter", label: "Hunter.io", hint: "Domain email discovery", placeholder: "Hunter API key" },
-  { id: "numverify", label: "Numverify", hint: "Carrier resolution for phone numbers", placeholder: "Numverify API key" },
+  { id: "shodan", label: "Shodan", hint: "Adds banners, organisation and history", placeholder: "Shodan API key" },
+  { id: "virustotal", label: "VirusTotal", hint: "Adds engine-level detections", placeholder: "VT API key" },
+  { id: "hibp", label: "Have I Been Pwned", hint: "Adds verified breach metadata", placeholder: "HIBP API key" },
+  { id: "hunter", label: "Hunter.io", hint: "Adds verified contact database", placeholder: "Hunter API key" },
+  { id: "numverify", label: "Numverify", hint: "Adds carrier resolution for phone numbers", placeholder: "Numverify API key" },
   { id: "github", label: "GitHub Token", hint: "Raises the rate limit from 60 to 5000 req/h", placeholder: "ghp_..." },
 ];
 

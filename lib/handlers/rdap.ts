@@ -78,39 +78,62 @@ export async function GET(req: NextRequest) {
   const kind = isIp(q) ? "ip" : "domain";
   const resolved = await rdapTarget(q);
   const url = resolved.url;
+  const tld = kind === "domain" ? q.split(".").pop()?.toLowerCase() || "" : "";
 
-  try {
-    const data = await getJson<RdapResponse>(url, { redirect: "follow" }, 14000);
-    const events: Record<string, string> = {};
-    for (const e of data.events || []) if (e.eventAction) events[e.eventAction] = e.eventDate;
-
-    const entities = flattenEntities(data.entities);
-    const uniqueEntities = entities.filter((e, i, arr) => arr.findIndex((x) => x.role === e.role && x.name === e.name && x.email === e.email) === i);
-
-    return NextResponse.json(
-      {
-        target: q,
-        kind,
-        handle: data.handle || null,
-        name: data.unicodeName || data.ldhName || data.name || null,
-        status: data.status || [],
-        registered: events.registration || null,
-        updated: events["last changed"] || events.lastChanged || null,
-        expires: events.expiration || null,
-        transferred: events.transfer || null,
-        nameservers: (data.nameservers || []).map((n) => n.ldhName).filter(Boolean),
-        entities: uniqueEntities.slice(0, 25),
-        dnssec: data.secureDNS?.delegationSigned ?? null,
-        range: data.startAddress ? `${data.startAddress} — ${data.endAddress}` : null,
-        ipVersion: data.ipVersion || null,
-        type: data.type || null,
-        links: (data.links || []).map((l) => l.href).slice(0, 6),
-        notices: (data.notices || []).map((n) => ({ title: n.title, description: n.description?.slice(0, 3) })).slice(0, 4),
-        source: url,
-      },
-      { headers: JSON_HEADERS },
-    );
-  } catch (e) {
-    return NextResponse.json({ error: errMessage(e), target: q, source: url }, { status: 502, headers: JSON_HEADERS });
+  const candidates = [url];
+  if (kind === "domain") {
+    if (tld === "com") candidates.push(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(q)}`);
+    if (tld === "net") candidates.push(`https://rdap.verisign.com/net/v1/domain/${encodeURIComponent(q)}`);
+    if (tld === "org") candidates.push(`https://rdap.publicinterestregistry.org/rdap/domain/${encodeURIComponent(q)}`);
+    candidates.push(`https://rdap.org/domain/${encodeURIComponent(q)}`);
+  } else {
+    candidates.push(`https://rdap.org/ip/${encodeURIComponent(q)}`);
   }
+
+  let lastError = "";
+  for (const candidate of [...new Set(candidates)]) {
+    try {
+      const data = await getJson<RdapResponse>(
+        candidate,
+        { redirect: "follow", headers: { accept: "application/rdap+json, application/json" } },
+        12000,
+      );
+      const events: Record<string, string> = {};
+      for (const e of data.events || []) if (e.eventAction) events[e.eventAction] = e.eventDate;
+
+      const entities = flattenEntities(data.entities);
+      const uniqueEntities = entities.filter((e, i, arr) => arr.findIndex((x) => x.role === e.role && x.name === e.name && x.email === e.email) === i);
+
+      return NextResponse.json(
+        {
+          target: q,
+          kind,
+          handle: data.handle || null,
+          name: data.unicodeName || data.ldhName || data.name || null,
+          status: data.status || [],
+          registered: events.registration || null,
+          updated: events["last changed"] || events.lastChanged || null,
+          expires: events.expiration || null,
+          transferred: events.transfer || null,
+          nameservers: (data.nameservers || []).map((n) => n.ldhName).filter(Boolean),
+          entities: uniqueEntities.slice(0, 25),
+          dnssec: data.secureDNS?.delegationSigned ?? null,
+          range: data.startAddress ? `${data.startAddress} — ${data.endAddress}` : null,
+          ipVersion: data.ipVersion || null,
+          type: data.type || null,
+          links: (data.links || []).map((l) => l.href).slice(0, 6),
+          notices: (data.notices || []).map((n) => ({ title: n.title, description: n.description?.slice(0, 3) })).slice(0, 4),
+          source: candidate,
+        },
+        { headers: JSON_HEADERS },
+      );
+    } catch (e) {
+      lastError = errMessage(e);
+    }
+  }
+
+  return NextResponse.json(
+    { error: lastError || "RDAP lookup failed", target: q, hint: "Registry rate limit. Retry in a few seconds." },
+    { status: 502, headers: JSON_HEADERS },
+  );
 }

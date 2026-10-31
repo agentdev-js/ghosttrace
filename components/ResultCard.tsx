@@ -1,20 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  ExternalLink,
-  Info,
-  KeyRound,
-  RefreshCw,
-  Settings2,
-} from "lucide-react";
+import { AlertTriangle, ExternalLink, KeyRound } from "lucide-react";
 import type { FeedItem } from "@/lib/types";
-import { MODULE_MAP } from "@/lib/modules";
-import { CATEGORY_TINT, MODULE_ICONS } from "./icons";
+import { MODULES, MODULE_MAP } from "@/lib/modules";
 import { CopyBtn, Value } from "./ValueView";
 import { copyText, prettyJson } from "@/lib/utils";
 import { toast } from "@/lib/toast";
@@ -23,31 +12,6 @@ function seconds(ms?: number) {
   if (!ms) return "";
   if (ms < 1000) return `${Math.round(ms)}ms`;
   return `${(ms / 1000).toFixed(2)}s`;
-}
-
-function VerdictPill({ status }: { status: FeedItem["status"] }) {
-  if (status === "running") {
-    return (
-      <span className="pill running">
-        <span className="dot" />
-        <span className="label">Live</span>
-      </span>
-    );
-  }
-  if (status === "error") {
-    return (
-      <span className="pill error">
-        <span className="dot" />
-        <span className="label">Failed</span>
-      </span>
-    );
-  }
-  return (
-    <span className="pill done">
-      <span className="dot" />
-      <span className="label">Done</span>
-    </span>
-  );
 }
 
 function UsernameView({ data }: { data: Record<string, unknown> }) {
@@ -164,6 +128,43 @@ function CveView({ data }: { data: Record<string, unknown> }) {
   );
 }
 
+function DnsView({ data }: { data: Record<string, unknown> }) {
+  const records = (data.records as Record<string, unknown>[]) || [];
+  const rows: { group: string; name: string; ttl: unknown; value: string }[] = [];
+  for (const rec of records) {
+    const group = String(rec.type || "");
+    const answers = (rec.answers as Record<string, unknown>[]) || [];
+    if (answers.length === 0) rows.push({ group, name: "—", ttl: "—", value: "no answers" });
+    for (const a of answers) {
+      rows.push({
+        group,
+        name: String(a.name ?? ""),
+        ttl: a.ttl ?? "—",
+        value: String(a.data ?? ""),
+      });
+    }
+  }
+  if (rows.length === 0) return <div className="ent-empty">No DNS answers returned.</div>;
+  return (
+    <div className="dns-table">
+      <div className="dns-head">
+        <span>record</span>
+        <span>name</span>
+        <span>ttl</span>
+        <span>data</span>
+      </div>
+      {rows.map((r, i) => (
+        <div className="dns-row" key={`${r.name}-${r.value}-${i}`}>
+          <span className="dns-type">{i === 0 || rows[i - 1].group !== r.group ? r.group : ""}</span>
+          <span className="dns-name">{r.name}</span>
+          <span className="dns-ttl">{String(r.ttl)}</span>
+          <span className="dns-data">{r.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Body({ item }: { item: FeedItem }) {
   const mod = MODULE_MAP.get(item.moduleId);
 
@@ -205,6 +206,7 @@ function Body({ item }: { item: FeedItem }) {
   if (mod?.id === "username") return <UsernameView data={data} />;
   if (mod?.id === "dorks") return <DorksView data={data} />;
   if (mod?.id === "cve") return <CveView data={data} />;
+  if (mod?.id === "dns") return <DnsView data={data} />;
 
   const clean: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(data)) {
@@ -217,23 +219,19 @@ function Body({ item }: { item: FeedItem }) {
 export function ResultCard({
   item,
   onRetry,
-  onSettings,
 }: {
   item: FeedItem;
   onRetry: (item: FeedItem) => void;
-  onSettings: () => void;
 }) {
   const [hidden, setHidden] = useState(false);
   const mod = MODULE_MAP.get(item.moduleId);
-  const tint = CATEGORY_TINT[mod?.category || "Utility"] || CATEGORY_TINT.Utility;
-  const Icon = MODULE_ICONS[mod?.icon || ""] || Info;
+  const index = String(MODULES.findIndex((m) => m.id === item.moduleId) + 1).padStart(2, "0");
   const payload = (item.data || {}) as Record<string, unknown>;
   const source = typeof payload.source === "string" && payload.source.startsWith("http") ? payload.source : null;
-  const needsKey = typeof payload.needsKey === "string";
 
   const summary = useMemo(() => {
-    if (item.status === "running") return "working";
-    if (item.status === "error") return "failed";
+    if (item.status === "running") return "in flight";
+    if (item.status === "error") return "stopped";
     if (mod?.id === "username") return `${payload.foundCount ?? 0} profiles`;
     if (mod?.id === "dorks") return `${payload.count ?? 0} queries`;
     if (mod?.id === "cve") return `${payload.total ?? 0} records`;
@@ -243,23 +241,20 @@ export function ResultCard({
     return "complete";
   }, [item.status, mod?.id, payload]);
 
+  const state = item.status === "running" ? "running" : item.status === "error" ? "failed" : "ok";
+
   return (
     <article className={`bubble ${item.status}`}>
       <header className="bubble-head">
-        <div className="b-icon" style={{ background: tint.bg, borderColor: tint.border, color: tint.color }}>
-          <Icon size={16} />
-        </div>
+        <span className="b-index">{index}</span>
         <div className="b-titles">
-          <div className="b-name">
-            {mod?.name || item.moduleId}
-            {mod?.needsKey && <span className="mod-key">{mod.needsKey.toUpperCase()}</span>}
-          </div>
+          <div className="b-name">{mod?.name || item.moduleId}</div>
           <div className="b-sub">
             {item.moduleId} · {item.target} · {summary}
           </div>
         </div>
         <div className="b-meta">
-          <VerdictPill status={item.status} />
+          <span className={`b-state ${state}`}>{state}</span>
           {item.status !== "running" && <span className="dur">{seconds(item.duration)}</span>}
         </div>
       </header>
@@ -273,8 +268,7 @@ export function ResultCard({
       <footer className="b-foot">
         {source && (
           <a href={source} target="_blank" rel="noreferrer">
-            <ExternalLink size={10} />
-            Source
+            source ↗
           </a>
         )}
         <button
@@ -284,25 +278,16 @@ export function ResultCard({
             toast(done ? "JSON copied" : "Clipboard blocked");
           }}
         >
-          <Copy size={10} />
-          JSON
+          copy json
         </button>
         {item.status !== "running" && (
           <button type="button" onClick={() => onRetry(item)}>
-            <RefreshCw size={10} />
-            Retry
-          </button>
-        )}
-        {needsKey && (
-          <button type="button" onClick={onSettings}>
-            <Settings2 size={10} />
-            Add key
+            retry
           </button>
         )}
         <span className="spacer" />
         <button type="button" onClick={() => setHidden((v) => !v)}>
-          {hidden ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
-          {hidden ? "Show" : "Hide"}
+          {hidden ? "show" : "hide"}
         </button>
       </footer>
     </article>

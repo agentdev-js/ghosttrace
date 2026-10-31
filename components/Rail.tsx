@@ -29,33 +29,39 @@ export function Rail({
     <nav className="rail">
       <button type="button" className="rail-logo" onClick={onTop} title="GhostTrace">
         <svg width="22" height="22" viewBox="0 0 64 64" fill="none">
-          <circle cx="32" cy="32" r="19" stroke="#2aabee" strokeWidth="3" opacity=".45" />
-          <circle cx="32" cy="32" r="9" stroke="#4cc3ff" strokeWidth="3" opacity=".85" />
-          <circle cx="32" cy="32" r="3" fill="#2aabee" />
-          <path d="M32 3v7M32 54v7M3 32h7M54 32h7" stroke="#9b7bff" strokeWidth="3" strokeLinecap="round" opacity=".8" />
+          <circle cx="32" cy="32" r="19" stroke="#72c7e8" strokeWidth="3" opacity=".45" />
+          <circle cx="32" cy="32" r="9" stroke="#a9e2f4" strokeWidth="3" opacity=".85" />
+          <circle cx="32" cy="32" r="3" fill="#72c7e8" />
+          <path d="M32 3v7M32 54v7M3 32h7M54 32h7" stroke="#697684" strokeWidth="3" strokeLinecap="round" opacity=".8" />
         </svg>
       </button>
 
-      <button type="button" className="rail-btn active" data-tip="Console" onClick={onTop}>
-        <Radar size={18} />
+      <button type="button" className="rail-btn active" title="Console" onClick={onTop}>
+        <Radar size={17} />
+        <span className="rail-label">console</span>
       </button>
-      <button type="button" className="rail-btn" data-tip="History" onClick={onHistory}>
-        <History size={18} />
+      <button type="button" className="rail-btn" title="History" onClick={onHistory}>
+        <History size={17} />
+        <span className="rail-label">history</span>
       </button>
-      <button type="button" className={`rail-btn ${entitiesOpen ? "active" : ""}`} data-tip="Entities" onClick={onEntities}>
-        <Fingerprint size={18} />
+      <button type="button" className={`rail-btn ${entitiesOpen ? "active" : ""}`} title="Entities" onClick={onEntities}>
+        <Fingerprint size={17} />
+        <span className="rail-label">index</span>
       </button>
-      <button type="button" className="rail-btn" data-tip="Palette" onClick={onPalette}>
-        <Command size={18} />
+      <button type="button" className="rail-btn" title="Palette" onClick={onPalette}>
+        <Command size={17} />
+        <span className="rail-label">search</span>
       </button>
 
       <span className="rail-spacer" />
 
-      <button type="button" className="rail-btn" data-tip="Settings" onClick={onSettings}>
-        <Settings2 size={18} />
+      <button type="button" className="rail-btn" title="Settings" onClick={onSettings}>
+        <Settings2 size={17} />
+        <span className="rail-label">keys</span>
       </button>
-      <a className="rail-btn" data-tip="GitHub" href="https://github.com/agentdev-js" target="_blank" rel="noreferrer">
-        <GithubMark size={17} />
+      <a className="rail-btn" title="GitHub" href="https://github.com/agentdev-js" target="_blank" rel="noreferrer">
+        <GithubMark size={16} />
+        <span className="rail-label">github</span>
       </a>
     </nav>
   );

@@ -72,9 +72,36 @@ const NOISE = new Set([
   "censys.io",
   "search.censys.io",
   "apilayer.net",
+  "rdap.verisign.com",
+  "whois.domaintools.com",
+  "domaintools.com",
+  "ipapi.co",
+  "ipinfo.io",
+  "ip-api.com",
+  "otx.alienvault.com",
+  "alienvault.com",
+  "xposedornot.com",
+  "leakcheck.io",
+  "data.iana.org",
+  "rdap.publicinterestregistry.org",
+  "publicinterestregistry.org",
+  "verisign.com",
 ]);
 
-const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+export const GENERATED_KEYS = new Set([
+  "personalPatterns",
+  "roleAccounts",
+  "pattern",
+  "candidate",
+  "candidates",
+  "query",
+  "result",
+  "note",
+  "hint",
+  "placeholder",
+]);
+
+const RE_EMAIL = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 const RE_URL = /^https?:\/\/[^\s]+$/i;
 const RE_IPV4 = /^(\d{1,3}\.){3}\d{1,3}$/;
 const RE_DOMAIN = /^(?!-)[a-z0-9-]{1,63}(\.[a-z0-9-]{1,63})*\.[a-z]{2,24}$/i;
@@ -105,7 +132,7 @@ export function extractEntities(payloads: unknown[]): EntitySet {
   const walk = (value: unknown, key: string, depth: number) => {
     if (depth > 8 || value === null || value === undefined) return;
     if (typeof value === "string") {
-      if (key === "source" || value.length > 400) return;
+      if (GENERATED_KEYS.has(key) || key === "source" || value.length > 400) return;
       const s = value.trim();
       if (RE_EMAIL.test(s)) {
         emails.add(s.toLowerCase());
@@ -113,12 +140,15 @@ export function extractEntities(payloads: unknown[]): EntitySet {
         return;
       }
       if (RE_URL.test(s)) {
-        urls.add(s);
+        let host = "";
         try {
-          addDomain(new URL(s).hostname);
+          host = new URL(s).hostname.toLowerCase();
         } catch {
           return;
         }
+        if (NOISE.has(host) || NOISE.has(host.replace(/^www\./, ""))) return;
+        urls.add(s);
+        addDomain(host);
         return;
       }
       if (RE_IPV4.test(s) && validIp(s)) {
@@ -142,7 +172,7 @@ export function extractEntities(payloads: unknown[]): EntitySet {
     }
     if (typeof value === "object") {
       for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-        if (k === "source" || k === "avatar" || k === "logo" || k === "screenshot") continue;
+        if (GENERATED_KEYS.has(k) || k === "source" || k === "avatar" || k === "logo" || k === "screenshot") continue;
         walk(v, k, depth + 1);
       }
     }

@@ -64,6 +64,21 @@ function emailDorks(t: string): Dork[] {
   ];
 }
 
+function personDorks(t: string): Dork[] {
+  return [
+    { label: "Exact name", query: `"${t}"`, url: G(`"${t}"`), engine: "Google" },
+    { label: "Professional profiles", query: `"${t}" site:linkedin.com`, url: G(`"${t}" site:linkedin.com`), engine: "Google" },
+    { label: "Contact traces", query: `"${t}" (email OR phone OR contact OR address)`, url: G(`"${t}" (email OR phone OR contact OR address)`), engine: "Google" },
+    { label: "Documents", query: `"${t}" (filetype:pdf OR filetype:doc OR filetype:xlsx)`, url: G(`"${t}" (filetype:pdf OR filetype:doc OR filetype:xlsx)`), engine: "Google" },
+    { label: "Social profiles", query: `"${t}" (site:facebook.com OR site:instagram.com OR site:x.com)`, url: G(`"${t}" (site:facebook.com OR site:instagram.com OR site:x.com)`), engine: "Google" },
+    { label: "News mentions", query: `"${t}" (news OR interview OR article)`, url: G(`"${t}" (news OR interview OR article)`), engine: "Google" },
+    { label: "Court records", query: `"${t}" (court OR lawsuit OR case OR docket)`, url: G(`"${t}" (court OR lawsuit OR case OR docket)`), engine: "Google" },
+    { label: "Breach mentions", query: `"${t}" (breach OR leak OR dump OR combo)`, url: G(`"${t}" (breach OR leak OR dump OR combo)`), engine: "Google" },
+    { label: "GitHub users", query: `"${t}"`, url: `https://github.com/search?q=${encodeURIComponent(t)}&type=users`, engine: "GitHub" },
+    { label: "Bing exact", query: `"${t}"`, url: B(`"${t}"`), engine: "Bing" },
+  ];
+}
+
 function ipDorks(t: string): Dork[] {
   return [
     { label: "Exact IP", query: `"${t}"`, url: G(`"${t}"`), engine: "Google" },
@@ -120,6 +135,7 @@ export async function GET(req: NextRequest) {
   let dorks: Dork[] = [];
   if (type === "domain" || type === "url") dorks = domainDorks(raw.replace(/^https?:\/\//, "").split("/")[0]);
   else if (type === "username") dorks = usernameDorks(raw.replace(/^@/, ""));
+  else if (type === "person") dorks = personDorks(raw);
   else if (type === "email") dorks = emailDorks(raw);
   else if (type === "ip") dorks = ipDorks(raw);
   else if (type === "cve") dorks = cveDorks(raw);

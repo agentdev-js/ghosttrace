@@ -31,6 +31,14 @@ function isIpv6(v: string) {
   return v.length <= 45;
 }
 
+function isPersonName(v: string) {
+  if (!/\s/.test(v)) return false;
+  if (v.length < 3 || v.length > 64) return false;
+  if (!/^[A-Za-z][A-Za-z\s.'-]+$/.test(v)) return false;
+  const words = v.split(/\s+/).filter(Boolean);
+  return words.length >= 2 && words.length <= 5;
+}
+
 export function detectType(raw: string): TargetType {
   const v = raw.trim();
   if (!v) return "unknown";
@@ -51,6 +59,7 @@ export function detectType(raw: string): TargetType {
   }
   if (v.startsWith("@") && RE.username.test(v.slice(1))) return "username";
   if (RE.username.test(v)) return "username";
+  if (isPersonName(v)) return "person";
   return "unknown";
 }
 
@@ -75,6 +84,7 @@ export const TYPE_LABEL: Record<TargetType, string> = {
   ip: "IP address",
   email: "Email",
   username: "Username",
+  person: "Name",
   phone: "Phone",
   btc: "Bitcoin",
   eth: "Ethereum",

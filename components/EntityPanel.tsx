@@ -1,17 +1,16 @@
 "use client";
 
-import { Copy, Fingerprint, X } from "lucide-react";
 import type { EntitySet } from "@/lib/types";
 import { copyText } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 
-const GROUPS: { key: keyof EntitySet; label: string; color: string }[] = [
-  { key: "domains", label: "Domains", color: "#4cc3ff" },
-  { key: "ips", label: "IP addresses", color: "#3ddc97" },
-  { key: "emails", label: "Emails", color: "#9b7bff" },
-  { key: "urls", label: "URLs", color: "#ffb340" },
-  { key: "hashes", label: "Hashes", color: "#ff7ab8" },
-  { key: "wallets", label: "Wallets", color: "#ff8a5c" },
+const GROUPS: { key: keyof EntitySet; label: string }[] = [
+  { key: "domains", label: "Domains" },
+  { key: "ips", label: "IP addresses" },
+  { key: "emails", label: "Emails" },
+  { key: "urls", label: "URLs" },
+  { key: "hashes", label: "Hashes" },
+  { key: "wallets", label: "Wallets" },
 ];
 
 export function EntityPanel({
@@ -33,20 +32,19 @@ export function EntityPanel({
       {open && <div className="drawer-backdrop ent-backdrop" onClick={onClose} />}
       <aside className={`entities ${open ? "open" : ""}`}>
         <div className="ent-head">
-          <Fingerprint size={14} style={{ color: "var(--accent-2)" }} />
-          <span className="ent-title">Entities</span>
+          <span className="ent-title">Entity index</span>
           <span className="ent-count">{total}</span>
           <span style={{ flex: 1 }} />
           <button type="button" className="modal-close ent-close" style={{ margin: 0 }} onClick={onClose} title="Close">
-            <X size={14} />
+            ×
           </button>
         </div>
 
         <div className="ent-scroll">
           {total === 0 ? (
             <div className="ent-empty">
-              Extracted domains, IPs, emails, URLs, hashes and wallets will collect here as results land. Click one to
-              pivot.
+              Extracted domains, IPs, emails, URLs, hashes and wallets appear here as results land. Select any value
+              to pivot.
             </div>
           ) : (
             GROUPS.map((g) => {
@@ -55,9 +53,8 @@ export function EntityPanel({
               return (
                 <div className="ent-group" key={g.key}>
                   <div className="ent-group-title">
-                    <span className="site-dot" style={{ background: g.color }} />
                     {g.label}
-                    <span style={{ marginLeft: "auto", color: "var(--faint)" }}>{list.length}</span>
+                    <span className="ent-group-count">{list.length}</span>
                   </div>
                   {list.map((v) => (
                     <button key={v} type="button" className="ent-item" title={`Pivot to ${v}`} onClick={() => onPick(v)}>
@@ -80,11 +77,10 @@ export function EntityPanel({
               toast(done ? `Copied ${all.length} entities` : "Clipboard blocked");
             }}
           >
-            <Copy size={10} />
-            Copy all
+            copy index
           </button>
           <button type="button" className="mini-btn" onClick={onClose}>
-            Close
+            close
           </button>
         </div>
       </aside>

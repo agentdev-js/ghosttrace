@@ -131,14 +131,6 @@ export function App() {
     [enabled, type, ready],
   );
 
-  const locked = useMemo(
-    () =>
-      MODULES.filter(
-        (m) => enabled.has(m.id) && type !== "unknown" && m.accepts.includes(type) && !ready.get(m.id),
-      ).length,
-    [enabled, type, ready],
-  );
-
   const entities = useMemo(
     () => extractEntities(items.filter((i) => i.status === "done").map((i) => i.data)),
     [items],
@@ -338,6 +330,20 @@ export function App() {
           </button>
         </div>
 
+        <div className="workspace-bar">
+          <div className="ws-left">
+            <span className="ws-path">GhostTrace</span>
+            <span className="ws-sep">/</span>
+            <span className="ws-target">{target.trim() || "no target"}</span>
+          </div>
+          <div className="ws-right">
+            <span className="ws-meta">{items.length} results</span>
+            <span className={`ws-state ${running > 0 ? "live" : ""}`}>
+              {running > 0 ? `${running} running` : "idle"}
+            </span>
+          </div>
+        </div>
+
         <TargetBar
           value={target}
           onChange={setTarget}
@@ -349,10 +355,7 @@ export function App() {
           }}
           running={running}
           armed={armed}
-          locked={locked}
           inputRef={inputRef}
-          onPalette={() => setPaletteOpen(true)}
-          onSettings={() => setSettingsOpen(true)}
         />
 
         <Feed
@@ -361,7 +364,6 @@ export function App() {
           onClear={() => setItems([])}
           onExport={exportFeed}
           onRetry={retryItem}
-          onSettings={() => setSettingsOpen(true)}
           onExample={(v) => {
             setTarget(v);
             runAllFrom(v);

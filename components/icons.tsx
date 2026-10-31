@@ -44,10 +44,10 @@ export const MODULE_ICONS: Record<string, LucideIcon> = {
 };
 
 export const CATEGORY_TINT: Record<string, { color: string; bg: string; border: string }> = {
-  Network: { color: "#4cc3ff", bg: "rgba(76,195,255,0.10)", border: "rgba(76,195,255,0.24)" },
-  Web: { color: "#3ddc97", bg: "rgba(61,220,151,0.09)", border: "rgba(61,220,151,0.22)" },
-  Identity: { color: "#9b7bff", bg: "rgba(155,123,255,0.10)", border: "rgba(155,123,255,0.24)" },
-  Social: { color: "#ff7ab8", bg: "rgba(255,122,184,0.09)", border: "rgba(255,122,184,0.22)" },
-  Threat: { color: "#ff6b6b", bg: "rgba(255,107,107,0.09)", border: "rgba(255,107,107,0.22)" },
-  Utility: { color: "#ffb340", bg: "rgba(255,179,64,0.09)", border: "rgba(255,179,64,0.22)" },
+  Network: { color: "#7ec8e3", bg: "rgba(114,199,232,0.07)", border: "rgba(114,199,232,0.20)" },
+  Web: { color: "#72d6a6", bg: "rgba(111,220,164,0.06)", border: "rgba(111,220,164,0.18)" },
+  Identity: { color: "#a9a1f5", bg: "rgba(169,161,245,0.07)", border: "rgba(169,161,245,0.20)" },
+  Social: { color: "#e6a1bd", bg: "rgba(230,161,189,0.06)", border: "rgba(230,161,189,0.18)" },
+  Threat: { color: "#ef8a8a", bg: "rgba(239,118,118,0.06)", border: "rgba(239,118,118,0.18)" },
+  Utility: { color: "#e0b36a", bg: "rgba(224,179,106,0.06)", border: "rgba(224,179,106,0.18)" },
 };

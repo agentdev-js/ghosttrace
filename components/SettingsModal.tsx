@@ -26,8 +26,8 @@ export function SettingsModal({
         <div className="modal-head">
           <KeyRound size={16} style={{ color: "var(--accent-2)" }} />
           <div>
-            <div className="modal-title">API keys</div>
-            <div className="modal-sub">{active} of {KEY_META.length} configured · stored in localStorage only</div>
+            <div className="modal-title">Optional API keys</div>
+            <div className="modal-sub">{active} of {KEY_META.length} configured · stored in this browser only</div>
           </div>
           <button type="button" className="modal-close" onClick={onClose}>
             <X size={15} />
@@ -76,8 +76,9 @@ export function SettingsModal({
           <div className="hint-box" style={{ marginTop: 4 }}>
             <KeyRound size={14} style={{ flexShrink: 0, marginTop: 1 }} />
             <div>
-              Keys never touch storage on the server. They are attached to a single request, used by that module, and
-              discarded. Environment variables set on Vercel take priority when present.
+              Every source works without a key. Optional keys unlock richer records, higher limits and verified
+              metadata. Keys are attached to a single request, used by that module, and discarded. Environment
+              variables set on Vercel take priority when present.
             </div>
           </div>
         </div>

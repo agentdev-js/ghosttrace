@@ -50,6 +50,17 @@ interface GhSocial {
   url: string;
 }
 
+interface GhSearch {
+  total_count: number;
+  items: {
+    login: string;
+    avatar_url: string;
+    html_url: string;
+    score: number;
+    type: string;
+  }[];
+}
+
 export async function GET(req: NextRequest) {
   const raw = (req.nextUrl.searchParams.get("q") || "").trim().replace(/^@/, "");
   if (!raw) return NextResponse.json({ error: "Missing q" }, { status: 400, headers: JSON_HEADERS });
@@ -60,6 +71,37 @@ export async function GET(req: NextRequest) {
     "x-github-api-version": "2022-11-28",
   };
   if (token) headers.authorization = `Bearer ${token}`;
+
+  if (/\s/.test(raw)) {
+    try {
+      const search = await getJson<GhSearch>(
+        `https://api.github.com/search/users?q=${encodeURIComponent(raw)}&per_page=20`,
+        { headers },
+        14000,
+      );
+      const profiles = (search.items || []).map((u) => ({
+        login: u.login,
+        url: u.html_url,
+        avatar: u.avatar_url,
+        type: u.type,
+        score: u.score,
+      }));
+      return NextResponse.json(
+        {
+          target: raw,
+          mode: "search",
+          found: profiles.length > 0,
+          total: search.total_count ?? profiles.length,
+          profiles,
+          authenticated: Boolean(token),
+          source: `https://github.com/search?q=${encodeURIComponent(raw)}&type=users`,
+        },
+        { headers: JSON_HEADERS },
+      );
+    } catch (e) {
+      return NextResponse.json({ error: errMessage(e), target: raw }, { status: 502, headers: JSON_HEADERS });
+    }
+  }
 
   try {
     const user = await getJson<GhUser>(`https://api.github.com/users/${encodeURIComponent(raw)}`, { headers }, 10000);

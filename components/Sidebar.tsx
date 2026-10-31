@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Play, Search, X, Zap } from "lucide-react";
+import { Check } from "lucide-react";
 import { CATEGORY_ORDER, MODULES } from "@/lib/modules";
 import type { ModuleCategory, ModuleDef } from "@/lib/types";
-import { MODULE_ICONS } from "./icons";
 
 export function Sidebar({
   enabled,
@@ -47,28 +46,28 @@ export function Sidebar({
       <div className="brand">
         <div className="brand-mark">
           <svg width="18" height="18" viewBox="0 0 64 64" fill="none">
-            <circle cx="32" cy="32" r="19" stroke="#2aabee" strokeWidth="3" opacity=".45" />
-            <circle cx="32" cy="32" r="9" stroke="#4cc3ff" strokeWidth="3" opacity=".8" />
-            <circle cx="32" cy="32" r="3" fill="#2aabee" />
+            <circle cx="32" cy="32" r="19" stroke="#72c7e8" strokeWidth="3" opacity=".45" />
+            <circle cx="32" cy="32" r="9" stroke="#a9e2f4" strokeWidth="3" opacity=".8" />
+            <circle cx="32" cy="32" r="3" fill="#72c7e8" />
           </svg>
         </div>
         <div>
           <div className="brand-name">GhostTrace</div>
           <div className="brand-tag">OSINT workstation</div>
         </div>
-        <span className="brand-version">v2</span>
+        <span className="brand-version">v2.1</span>
         <button type="button" className="side-close" onClick={onClose} title="Close">
-          <X size={15} />
+          ×
         </button>
       </div>
 
       <div className="side-search">
-        <Search size={13} />
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Filter modules" spellCheck={false} />
+        <span className="side-search-mark">/</span>
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="find a source" spellCheck={false} />
       </div>
 
       <div className="side-tools">
-        <span>{query ? `${visible} matching` : "Modules"}</span>
+        <span>{query ? `${visible} matching` : "Sources"}</span>
         <button
           type="button"
           onClick={() => {
@@ -83,16 +82,18 @@ export function Sidebar({
             }
           }}
         >
-          {enabled.size === MODULES.length ? "clear all" : "arm all"}
+          {enabled.size === MODULES.length ? "none" : "all"}
         </button>
       </div>
 
       <div className="mod-scroll">
         {groups.map(([cat, list]) => (
           <div key={cat}>
-            <div className="cat-label">{cat}</div>
+            <div className="cat-label">
+              {cat}
+              <span className="cat-count">{list.length}</span>
+            </div>
             {list.map((mod) => {
-              const Icon = MODULE_ICONS[mod.icon] || Zap;
               const on = enabled.has(mod.id);
               return (
                 <div
@@ -100,6 +101,7 @@ export function Sidebar({
                   className={`mod-row ${on ? "on" : ""}`}
                   role="button"
                   tabIndex={0}
+                  title={mod.description}
                   onClick={() => onToggle(mod.id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -108,16 +110,11 @@ export function Sidebar({
                     }
                   }}
                 >
-                  <span className="mod-check">{on && <Check size={10} strokeWidth={3.2} />}</span>
-                  <span className="mod-icon">
-                    <Icon size={13} />
-                  </span>
-                  <span className="mod-text">
-                    <span className="mod-name">
-                      {mod.name}
-                      {mod.needsKey && <span className="mod-key">KEY</span>}
-                    </span>
-                    <span className="mod-desc">{mod.description}</span>
+                  <span className="mod-index">{String(MODULES.indexOf(mod) + 1).padStart(2, "0")}</span>
+                  <span className="mod-check">{on && <Check size={9} strokeWidth={3.4} />}</span>
+                  <span className="mod-name">
+                    {mod.name}
+                    {mod.needsKey && <span className="mod-key">KEY</span>}
                   </span>
                   <button
                     type="button"
@@ -128,7 +125,7 @@ export function Sidebar({
                       onRunOne(mod);
                     }}
                   >
-                    <Play size={10} fill="currentColor" />
+                    run
                   </button>
                 </div>
               );
@@ -139,10 +136,9 @@ export function Sidebar({
 
       <div className="side-foot">
         <button type="button" className="run-all" onClick={onRunAll} disabled={runCount === 0}>
-          <Zap size={14} />
-          {running > 0 ? `Running ${running}…` : `Run ${runCount} modules`}
+          {running > 0 ? `running ${running}…` : `run ${runCount} sources`}
         </button>
-        <div className="side-foot-note">Keys stay in this browser. Nothing is logged server-side.</div>
+        <div className="side-foot-note">keys stay in this browser</div>
       </div>
     </aside>
   );

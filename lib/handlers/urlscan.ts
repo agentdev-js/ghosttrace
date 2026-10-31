@@ -42,8 +42,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  let query = `domain:${domain}`;
-  if (isIp) query = `ip:${raw}`;
+  let query = `page.domain:${domain}`;
+  if (isIp) query = `page.ip:${raw}`;
   else if (isUrl) query = `page.url:"${raw}"`;
 
   const url = `https://urlscan.io/api/v1/search/?q=${encodeURIComponent(query)}&size=50`;

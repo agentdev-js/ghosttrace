@@ -109,6 +109,31 @@ function isPrimitiveArray(v: unknown[]): boolean {
   return v.every((x) => typeof x === "string" || typeof x === "number" || typeof x === "boolean");
 }
 
+function RecordItem({ item, depth, index }: { item: Record<string, unknown>; depth: number; index: number }) {
+  const entries = Object.entries(item).filter(
+    ([, v]) => v !== null && v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0),
+  );
+  if (entries.length === 0) return null;
+  return (
+    <div className="record">
+      <span className="record-index">{String(index + 1).padStart(2, "0")}</span>
+      <div className="record-grid">
+        {entries.map(([k, v]) => {
+          const wide = typeof v === "object" && v !== null ? true : typeof v === "string" && v.length > 64;
+          return (
+            <div key={k} className={wide ? "rec-cell wide" : "rec-cell"}>
+              <span className="rec-key">{labelOf(k)}</span>
+              <span className="rec-val">
+                <Value v={v} depth={depth + 1} />
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function Value({ v, depth = 0 }: { v: unknown; depth?: number }) {
   if (v === null || v === undefined) return <span className="null">null</span>;
   if (typeof v === "boolean") return <span className={v ? "bool-t" : "bool-f"}>{String(v)}</span>;
@@ -130,6 +155,16 @@ export function Value({ v, depth = 0 }: { v: unknown; depth?: number }) {
       );
     }
     const items = v.slice(0, 30);
+    if (items.every((x) => x !== null && typeof x === "object" && !Array.isArray(x))) {
+      return (
+        <div className="records">
+          {items.map((x, i) => (
+            <RecordItem key={i} item={x as Record<string, unknown>} depth={depth} index={i} />
+          ))}
+          {v.length > 30 && <span className="dim mono" style={{ fontSize: 10 }}>+{v.length - 30} more entries</span>}
+        </div>
+      );
+    }
     return (
       <div className="blocks">
         {items.map((x, i) => (

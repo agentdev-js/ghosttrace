@@ -3,6 +3,7 @@ export type TargetType =
   | "ip"
   | "email"
   | "username"
+  | "person"
   | "phone"
   | "btc"
   | "eth"
