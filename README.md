@@ -2,7 +2,7 @@
 
 An OSINT workstation that looks and feels like a desktop chat client. Drop a target, fan it out across every compatible source, and read the findings in a single streaming feed.
 
-Live at [ghosttrace.vercel.app](https://ghosttrace.vercel.app) once deployed.
+Live at [ghosttrace-zeta.vercel.app](https://ghosttrace-zeta.vercel.app).
 
 ## What it does
 
