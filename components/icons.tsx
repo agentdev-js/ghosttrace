@@ -1,0 +1,53 @@
+import {
+  Network,
+  Globe,
+  MapPin,
+  ShieldCheck,
+  History,
+  Radar,
+  Terminal,
+  Users,
+  Code2,
+  Mail,
+  Phone,
+  Wallet,
+  Bug,
+  Server,
+  Biohazard,
+  KeyRound,
+  Crosshair,
+  Cpu,
+  Package,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+export const MODULE_ICONS: Record<string, LucideIcon> = {
+  network: Network,
+  globe: Globe,
+  "map-pin": MapPin,
+  shield: ShieldCheck,
+  history: History,
+  radar: Radar,
+  terminal: Terminal,
+  users: Users,
+  github: Code2,
+  mail: Mail,
+  phone: Phone,
+  wallet: Wallet,
+  bug: Bug,
+  server: Server,
+  virus: Biohazard,
+  "key-round": KeyRound,
+  crosshair: Crosshair,
+  cpu: Cpu,
+  package: Package,
+};
+
+export const CATEGORY_TINT: Record<string, { color: string; bg: string; border: string }> = {
+  Network: { color: "#4cc3ff", bg: "rgba(76,195,255,0.10)", border: "rgba(76,195,255,0.24)" },
+  Web: { color: "#3ddc97", bg: "rgba(61,220,151,0.09)", border: "rgba(61,220,151,0.22)" },
+  Identity: { color: "#9b7bff", bg: "rgba(155,123,255,0.10)", border: "rgba(155,123,255,0.24)" },
+  Social: { color: "#ff7ab8", bg: "rgba(255,122,184,0.09)", border: "rgba(255,122,184,0.22)" },
+  Threat: { color: "#ff6b6b", bg: "rgba(255,107,107,0.09)", border: "rgba(255,107,107,0.22)" },
+  Utility: { color: "#ffb340", bg: "rgba(255,179,64,0.09)", border: "rgba(255,179,64,0.22)" },
+};

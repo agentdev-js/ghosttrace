@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050507">
+<meta name="description" content="GhostTrace is a feature-rich advanced OSINT intelligence platform with all your investigation needs.">
+<title>GhostTrace — The Operating System for OSINT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#050507;color:#ECECF4;font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px)}
+::selection{background:rgba(124,92,252,.3);color:#fff}
+a{text-decoration:none;color:inherit}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none}
+ul{list-style:none}
+img{max-width:100%;display:block}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 40px}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:200;
+  height:62px;display:flex;align-items:center;padding:0 40px;justify-content:space-between;
+  background:rgba(5,5,7,.82);backdrop-filter:blur(22px) saturate(1.5);
+  border-bottom:1px solid rgba(236,236,244,.07);transition:background .3s;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;letter-spacing:-.3px}
+.nav-logo-img{width:34px;height:34px;border-radius:50%;object-fit:cover;box-shadow:0 0 16px rgba(124,92,252,.5)}
+.nav-logo-svg{width:34px;height:34px;background:linear-gradient(135deg,#7C5CFC,#A78BFF);border-radius:50%;display:grid;place-items:center;box-shadow:0 0 16px rgba(124,92,252,.5)}
+.nav-logo-svg svg{width:18px;height:18px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a,.nav-drop{font-size:14px;color:rgba(236,236,244,.55);font-weight:400;transition:color .15s;cursor:pointer;display:flex;align-items:center;gap:4px}
+.nav-links a:hover,.nav-drop:hover{color:#ECECF4}
+.nav-end{display:flex;align-items:center;gap:10px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;font-size:14px;font-weight:500;padding:9px 20px;transition:all .18s;white-space:nowrap}
+.btn-ghost{background:transparent;border:1px solid rgba(236,236,244,.1);color:rgba(236,236,244,.6)}
+.btn-ghost:hover{border-color:rgba(236,236,244,.2);color:#ECECF4;background:rgba(236,236,244,.05)}
+.btn-primary{background:#7C5CFC;color:#fff;border:1px solid transparent;box-shadow:0 0 22px rgba(124,92,252,.3)}
+.btn-primary:hover{background:#6344E8;box-shadow:0 0 32px rgba(124,92,252,.45);transform:translateY(-1px)}
+.btn-lg{padding:13px 30px;font-size:15px;border-radius:9px}
+.btn-xl{padding:15px 38px;font-size:15px;font-weight:600;border-radius:10px}
+.btn-outline-purple{background:transparent;border:1px solid rgba(124,92,252,.4);color:rgba(124,92,252,.9)}
+.btn-outline-purple:hover{background:rgba(124,92,252,.1);border-color:#7C5CFC;color:#A78BFF}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:120px 40px 60px;position:relative;overflow:hidden;
+}
+.hero-radial{
+  position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+  width:900px;height:700px;
+  background:radial-gradient(ellipse at 50% 25%,rgba(124,92,252,.18) 0%,rgba(124,92,252,.04) 45%,transparent 70%);
+  pointer-events:none;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(124,92,252,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,252,.035) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 75% 65% at 50% 25%,black 0%,transparent 80%);
+  pointer-events:none;
+}
+.hero-avatar{
+  width:92px;height:92px;border-radius:50%;object-fit:cover;
+  margin:0 auto 20px;
+  box-shadow:0 0 0 1px rgba(124,92,252,.35),0 0 48px rgba(124,92,252,.4),0 24px 64px rgba(0,0,0,.5);
+  animation:float 4s ease-in-out infinite;
+  position:relative;z-index:1;
+}
+.hero-avatar-fallback{
+  width:92px;height:92px;border-radius:50%;
+  background:linear-gradient(135deg,#7C5CFC 0%,#9B7DFF 50%,#C4ADFF 100%);
+  margin:0 auto 20px;
+  box-shadow:0 0 0 1px rgba(124,92,252,.35),0 0 48px rgba(124,92,252,.4),0 24px 64px rgba(0,0,0,.5);
+  animation:float 4s ease-in-out infinite;
+  display:grid;place-items:center;position:relative;z-index:1;
+}
+.hero-avatar-fallback svg{width:44px;height:44px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero-name{font-size:17px;font-weight:600;color:rgba(236,236,244,.6);margin-bottom:12px;position:relative;z-index:1}
+.hero-h1{
+  font-size:clamp(34px,6vw,72px);font-weight:800;line-height:1.05;letter-spacing:-2.5px;
+  color:#ECECF4;margin-bottom:12px;max-width:800px;position:relative;z-index:1;
+}
+.hero-sub{
+  font-size:18px;font-weight:400;color:rgba(236,236,244,.55);margin-bottom:10px;
+  position:relative;z-index:1;
+}
+.hero-desc{
+  font-size:16px;color:rgba(236,236,244,.45);line-height:1.7;max-width:600px;
+  margin:0 auto 32px;font-weight:300;position:relative;z-index:1;
+}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:56px;position:relative;z-index:1}
+
+.hero-overview{
+  position:relative;z-index:1;width:100%;max-width:940px;margin:0 auto;
+}
+.hero-overview-glow{
+  position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+  width:700px;height:200px;
+  background:radial-gradient(ellipse,rgba(124,92,252,.22) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-overview-img{
+  width:100%;border-radius:14px;
+  border:1px solid rgba(236,236,244,.08);
+  box-shadow:0 0 0 1px rgba(124,92,252,.1),0 48px 100px -20px rgba(0,0,0,.75),0 0 80px -20px rgba(124,92,252,.15);
+}
+.overview-placeholder{
+  width:100%;height:380px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(124,92,252,.08) 0%,rgba(13,13,21,.8) 60%,rgba(8,8,13,1) 100%);
+  border:1px solid rgba(124,92,252,.12);
+  box-shadow:0 48px 100px -20px rgba(0,0,0,.75),0 0 80px -20px rgba(124,92,252,.15);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(236,236,244,.25);
+}
+.overview-placeholder .ov-bar{
+  width:90%;background:rgba(13,13,21,.9);border:1px solid rgba(236,236,244,.07);
+  border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;
+  font-size:12px;color:rgba(236,236,244,.3);
+}
+.ov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ov-green{background:#27C93F}
+.ov-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.scroll-hint{margin-top:24px;font-size:13px;color:rgba(236,236,244,.3);display:flex;align-items:center;justify-content:center;gap:8px;position:relative;z-index:1}
+.sa{animation:sb 2s ease-in-out infinite}
+@keyframes sb{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ── MARQUEE ── */
+.marquee-wrap{padding:20px 0;border-top:1px solid rgba(236,236,244,.07);border-bottom:1px solid rgba(236,236,244,.07);background:#08080C;overflow:hidden}
+.marquee-track{display:flex;width:max-content;animation:mq 30s linear infinite}
+.marquee-track:hover{animation-play-state:paused}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-item{display:inline-flex;align-items:center;gap:10px;padding:7px 24px;font-size:13.5px;font-weight:500;color:rgba(236,236,244,.5);border-right:1px solid rgba(236,236,244,.07);white-space:nowrap}
+.mq-dot{width:6px;height:6px;background:#7C5CFC;border-radius:50%;opacity:.7;flex-shrink:0}
+
+/* ── SECTION COMMONS ── */
+.section{padding:96px 0}
+.section-alt{background:#08080C}
+.eyebrow{font-size:12px;font-weight:600;color:#7C5CFC;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;text-align:center}
+.sh{font-size:clamp(28px,3.5vw,46px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;color:#ECECF4;margin-bottom:12px;text-align:center}
+.sp{font-size:16px;color:rgba(236,236,244,.5);line-height:1.75;font-weight:300;max-width:540px;margin:0 auto 56px;text-align:center}
+.left-align{text-align:left}
+.left-align .sp{margin-left:0;margin-right:0}
+
+/* ── FEATURES GRID ── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat-card{
+  background:#0C0C13;border:1px solid rgba(236,236,244,.07);border-radius:14px;
+  padding:32px 28px;transition:all .22s;position:relative;overflow:hidden;
+}
+.feat-card::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,92,252,.5),transparent);opacity:0;transition:opacity .3s}
+.feat-card:hover{border-color:rgba(124,92,252,.22);transform:translateY(-3px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.feat-card:hover::after{opacity:1}
+.feat-icon{width:44px;height:44px;background:rgba(124,92,252,.12);border:1px solid rgba(124,92,252,.2);border-radius:10px;display:grid;place-items:center;margin-bottom:18px}
+.feat-icon svg{width:20px;height:20px;stroke:#7C5CFC;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.feat-title{font-size:17px;font-weight:700;color:#ECECF4;margin-bottom:10px;letter-spacing:-.3px}
+.feat-desc{font-size:14px;color:rgba(236,236,244,.5);line-height:1.65;font-weight:300;margin-bottom:16px}
+.feat-list{display:flex;flex-direction:column;gap:7px}
+.feat-list li{font-size:13px;color:rgba(236,236,244,.45);display:flex;align-items:center;gap:9px;font-weight:300}
+.feat-list li::before{content:"";width:5px;height:5px;background:#7C5CFC;border-radius:50%;flex-shrink:0}
+
+/* ── DASHBOARD SECTION ── */
+.dash-section{padding:96px 0;background:#08080C}
+.dash-inner{text-align:center}
+.dash-browser{
+  max-width:900px;margin:0 auto;
+  background:#0C0C13;border:1px solid rgba(236,236,244,.08);border-radius:14px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(124,92,252,.07),0 40px 100px -20px rgba(0,0,0,.7);
+}
+.db-bar{background:#101018;padding:12px 16px;border-bottom:1px solid rgba(236,236,244,.07);display:flex;align-items:center;gap:12px}
+.db-dots{display:flex;gap:6px}
+.db-dot{width:10px;height:10px;border-radius:50%}
+.db-url{flex:1;background:#0C0C13;border:1px solid rgba(236,236,244,.08);border-radius:5px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(236,236,244,.3);text-align:center;margin:0 8px}
+.dash-screenshots{display:grid;grid-template-columns:1fr;gap:0}
+.dash-ss{width:100%;display:block}
+.dash-ss-placeholder{
+  height:320px;
+  background:linear-gradient(160deg,rgba(124,92,252,.06) 0%,rgba(8,8,13,.9) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;
+}
+.dash-row{display:grid;grid-template-columns:260px 1fr;gap:0;height:320px}
+.dash-sidebar{background:rgba(8,8,13,.9);border-right:1px solid rgba(236,236,244,.06);padding:20px 16px;display:flex;flex-direction:column;gap:4px}
+.ds-item{padding:8px 12px;border-radius:6px;font-size:12.5px;color:rgba(236,236,244,.35);display:flex;align-items:center;gap:10px;font-weight:400;transition:all .15s}
+.ds-item.active{background:rgba(124,92,252,.12);color:rgba(236,236,244,.8);border:1px solid rgba(124,92,252,.15)}
+.ds-item::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5;flex-shrink:0}
+.dash-content{background:rgba(8,8,13,.95);padding:20px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.dc-header{display:flex;align-items:center;justify-content:space-between}
+.dc-title{font-size:15px;font-weight:700;color:rgba(236,236,244,.8)}
+.dc-badge{font-size:10px;padding:3px 8px;background:rgba(0,212,170,.1);color:#00D4AA;border:1px solid rgba(0,212,170,.2);border-radius:4px;font-family:'JetBrains Mono',monospace}
+.dc-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dc-card{background:rgba(13,13,21,.8);border:1px solid rgba(236,236,244,.07);border-radius:8px;padding:14px}
+.dc-card-n{font-size:22px;font-weight:800;color:#ECECF4;letter-spacing:-1px}
+.dc-card-l{font-size:11px;color:rgba(236,236,244,.35);font-weight:300;margin-top:2px}
+.dc-rows{display:flex;flex-direction:column;gap:1px}
+.dc-row-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(13,13,21,.6);border-radius:4px;font-size:11.5px;font-family:'JetBrains Mono',monospace}
+.dc-row-key{color:rgba(236,236,244,.35)}
+.dc-row-val-g{color:#00D4AA}
+.dc-row-val-a{color:#F5A623}
+.dc-row-val-p{color:#7C5CFC}
+.dc-row-val{color:rgba(236,236,244,.6)}
+
+/* ── SECURITY LAYERS ── */
+.sec-section{padding:96px 0}
+.sec-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.sec-layers{display:flex;flex-direction:column;gap:3px}
+.sec-layer{
+  display:flex;align-items:center;gap:20px;padding:20px 24px;
+  border-radius:12px;border:1px solid rgba(236,236,244,.07);background:#0C0C13;
+  position:relative;overflow:hidden;
+}
+.sec-layer-1{border-color:rgba(124,92,252,.25);background:rgba(124,92,252,.05)}
+.sec-layer-2{border-color:rgba(0,212,170,.18);background:rgba(0,212,170,.03)}
+.sec-layer-3{border-color:rgba(245,166,35,.18);background:rgba(245,166,35,.03)}
+.sec-layer-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:3px 9px;border-radius:4px;flex-shrink:0;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.slb-1{background:rgba(124,92,252,.15);color:#7C5CFC;border:1px solid rgba(124,92,252,.25)}
+.slb-2{background:rgba(0,212,170,.1);color:#00D4AA;border:1px solid rgba(0,212,170,.2)}
+.slb-3{background:rgba(245,166,35,.1);color:#F5A623;border:1px solid rgba(245,166,35,.2)}
+.sec-layer-name{font-size:15px;font-weight:700;color:#ECECF4;margin-bottom:3px}
+.sec-layer-desc{font-size:13px;color:rgba(236,236,244,.4);font-weight:300}
+.sec-connector{display:flex;justify-content:center;padding:2px 0}
+.sec-connector svg{opacity:.35}
+
+/* ── AUTOMATION ── */
+.auto-section{padding:96px 0;background:#08080C}
+.auto-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.auto-cards{display:flex;flex-direction:column;gap:14px}
+.auto-card{background:#0C0C13;border:1px solid rgba(236,236,244,.07);border-radius:12px;overflow:hidden}
+.ac-head{background:#101018;padding:12px 16px;border-bottom:1px solid rgba(236,236,244,.07);display:flex;align-items:center;justify-content:space-between}
+.ac-title{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(236,236,244,.4);letter-spacing:.03em}
+.ac-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px}
+.acb-ok{background:rgba(0,212,170,.1);color:#00D4AA;border:1px solid rgba(0,212,170,.2)}
+.acb-warn{background:rgba(245,166,35,.1);color:#F5A623;border:1px solid rgba(245,166,35,.2)}
+.acb-info{background:rgba(124,92,252,.12);color:#7C5CFC;border:1px solid rgba(124,92,252,.2)}
+.ac-body{padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9;display:flex;flex-direction:column;gap:0}
+.ac-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+.ac-key{color:rgba(236,236,244,.3)}
+.ac-v{color:rgba(236,236,244,.65)}
+.ac-vg{color:#00D4AA}
+.ac-va{color:#F5A623}
+.ac-vp{color:#7C5CFC}
+
+/* ── PREMIUM ── */
+.premium-section{padding:96px 0;position:relative;overflow:hidden}
+.premium-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(124,92,252,.1) 0%,transparent 65%);pointer-events:none}
+.premium-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.prem-cards{display:flex;flex-direction:column;gap:12px}
+.prem-card{background:#0C0C13;border:1px solid rgba(236,236,244,.07);border-radius:12px;padding:22px 24px;transition:border-color .2s}
+.prem-card:hover{border-color:rgba(124,92,252,.2)}
+.prem-card-title{font-size:14px;font-weight:700;color:#ECECF4;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.prem-card-title::before{content:"";width:8px;height:8px;background:#7C5CFC;border-radius:50%;box-shadow:0 0 8px rgba(124,92,252,.6);flex-shrink:0}
+.prem-tags{display:flex;flex-wrap:wrap;gap:8px}
+.pt{font-size:12.5px;color:rgba(236,236,244,.5);padding:4px 11px;background:rgba(236,236,244,.05);border:1px solid rgba(236,236,244,.08);border-radius:100px}
+
+.prem-cta{
+  background:linear-gradient(145deg,rgba(124,92,252,.14) 0%,rgba(124,92,252,.04) 100%);
+  border:1px solid rgba(124,92,252,.25);border-radius:16px;padding:40px 36px;text-align:center;position:relative;overflow:hidden;
+}
+.prem-cta::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:250px;height:250px;background:radial-gradient(circle,rgba(124,92,252,.14) 0%,transparent 70%);pointer-events:none}
+.pc-eye{font-size:11px;font-weight:700;color:#7C5CFC;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;position:relative}
+.pc-price-wrap{position:relative;margin-bottom:6px}
+.pc-price{font-size:56px;font-weight:800;color:#ECECF4;letter-spacing:-2px;line-height:1;position:relative}
+.pc-price sup{font-size:24px;font-weight:400;vertical-align:super;letter-spacing:0}
+.pc-cycle{font-size:13px;color:rgba(236,236,244,.35);margin-bottom:20px;font-weight:300;position:relative}
+.pc-desc{font-size:14px;color:rgba(236,236,244,.45);line-height:1.65;font-weight:300;margin-bottom:22px;position:relative}
+.pc-feat-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:28px;position:relative}
+.pft{font-size:12px;color:#7C5CFC;padding:4px 12px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.18);border-radius:100px;font-weight:500}
+.pc-badges{display:flex;justify-content:center;gap:8px;margin-top:16px;position:relative}
+.pc-badge-pill{font-size:11px;color:rgba(236,236,244,.4);padding:3px 10px;background:rgba(236,236,244,.05);border:1px solid rgba(236,236,244,.08);border-radius:100px}
+
+/* ── WHY ── */
+.why-section{padding:96px 0;background:#08080C}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.why-card{background:#0C0C13;border:1px solid rgba(236,236,244,.07);border-radius:14px;padding:28px 24px;transition:all .2s}
+.why-card:hover{border-color:rgba(124,92,252,.2);transform:translateY(-2px)}
+.why-icon{width:38px;height:38px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.18);border-radius:8px;display:grid;place-items:center;margin-bottom:14px}
+.why-icon svg{width:17px;height:17px;stroke:#7C5CFC;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.why-title{font-size:15px;font-weight:700;color:#ECECF4;margin-bottom:8px}
+.why-desc{font-size:13.5px;color:rgba(236,236,244,.45);line-height:1.65;font-weight:300}
+
+/* ── FINAL CTA ── */
+.cta-section{padding:96px 0;text-align:center;position:relative;overflow:hidden}
+.cta-bg-glow{position:absolute;bottom:-100px;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(124,92,252,.1) 0%,transparent 65%);pointer-events:none}
+.cta-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7C5CFC,#9B7DFF);margin:0 auto 18px;display:grid;place-items:center;box-shadow:0 0 32px rgba(124,92,252,.38);position:relative;z-index:1}
+.cta-avatar svg{width:34px;height:34px}
+.cta-h{font-size:clamp(28px,4.5vw,56px);font-weight:800;letter-spacing:-2px;color:#ECECF4;margin-bottom:14px;line-height:1.08;position:relative;z-index:1}
+.cta-p{font-size:16px;color:rgba(236,236,244,.45);font-weight:300;line-height:1.7;max-width:500px;margin:0 auto 36px;position:relative;z-index:1}
+.cta-btns{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:64px;position:relative;z-index:1}
+.stats-row{display:flex;align-items:center;justify-content:center;gap:64px;padding-top:40px;border-top:1px solid rgba(236,236,244,.07);flex-wrap:wrap;position:relative;z-index:1}
+.stat-item{text-align:center}
+.stat-n{font-size:40px;font-weight:800;letter-spacing:-1.5px;color:#ECECF4;display:block;line-height:1;margin-bottom:6px}
+.stat-l{font-size:13px;color:rgba(236,236,244,.35);font-weight:300}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid rgba(236,236,244,.07);padding:56px 0 36px;background:#08080C}
+.footer-grid{display:grid;grid-template-columns:240px repeat(3,1fr);gap:48px;margin-bottom:48px}
+.footer-logo-row{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:700;margin-bottom:10px}
+.flr-icon{width:28px;height:28px;background:linear-gradient(135deg,#7C5CFC,#9B7DFF);border-radius:50%;display:grid;place-items:center}
+.flr-icon svg{width:13px;height:13px}
+.footer-desc{font-size:13px;color:rgba(236,236,244,.3);line-height:1.65;font-weight:300;max-width:185px;margin-bottom:16px}
+.footer-contact{font-size:12px;color:rgba(236,236,244,.25);line-height:1.8}
+.footer-col-title{font-size:13px;font-weight:600;color:#ECECF4;margin-bottom:16px}
+.footer-col-links{display:flex;flex-direction:column;gap:10px}
+.footer-col-links a{font-size:13px;color:rgba(236,236,244,.3);transition:color .15s;font-weight:300}
+.footer-col-links a:hover{color:rgba(236,236,244,.6)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:24px;border-top:1px solid rgba(236,236,244,.07);flex-wrap:wrap;gap:12px}
+.footer-copy{font-size:12px;color:rgba(236,236,244,.25)}
+.footer-legal{display:flex;gap:16px;flex-wrap:wrap}
+.footer-legal a{font-size:12px;color:rgba(236,236,244,.25);transition:color .15s}
+.footer-legal a:hover{color:rgba(236,236,244,.45)}
+
+/* ── REVEAL ── */
+[data-r]{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
+[data-r].in{opacity:1;transform:translateY(0)}
+[data-r][data-d="1"]{transition-delay:.1s}
+[data-r][data-d="2"]{transition-delay:.2s}
+[data-r][data-d="3"]{transition-delay:.3s}
+[data-r][data-d="4"]{transition-delay:.4s}
+[data-r][data-d="5"]{transition-delay:.5s}
+[data-r][data-d="6"]{transition-delay:.6s}
+
+.hero-avatar-fallback,.hero-name,.hero-h1,.hero-sub,.hero-desc,.hero-btns,.hero-overview{
+  opacity:0;animation:hf .65s forwards;
+}
+.hero-avatar-fallback{animation-delay:.1s}
+.hero-name{animation-delay:.22s}
+.hero-h1{animation-delay:.34s}
+.hero-sub{animation-delay:.44s}
+.hero-desc{animation-delay:.52s}
+.hero-btns{animation-delay:.62s}
+.hero-overview{animation-delay:.45s}
+@keyframes hf{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:1024px){
+  .feat-grid{grid-template-columns:repeat(2,1fr)}
+  .sec-inner,.auto-inner,.premium-inner{grid-template-columns:1fr;gap:40px}
+  .why-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .wrap{padding:0 20px}
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .feat-grid{grid-template-columns:1fr}
+  .why-grid{grid-template-columns:1fr}
+  .stats-row{gap:32px}
+  .footer-grid{grid-template-columns:1fr}
+  .section{padding:64px 0}
+  .hero{padding:100px 20px 56px}
+  .dash-row{grid-template-columns:1fr;height:auto}
+  .dash-sidebar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-svg">
+      <svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="8" cy="8" r="5"/><line x1="11.5" y1="11.5" x2="16" y2="16"/>
+        <circle cx="8" cy="8" r="2"/>
+      </svg>
+    </div>
+    GhostTrace
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <div class="nav-drop">Resources <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5l3 3 3-3"/></svg></div>
+    <a href="#api">API</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-end">
+    <a href="#" class="btn btn-ghost">Sign in</a>
+    <a href="#pricing" class="btn btn-primary">Get started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-radial"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-avatar-fallback">
+    <svg viewBox="0 0 44 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="19" cy="19" r="13"/><line x1="28" y1="28" x2="40" y2="40"/>
+      <circle cx="19" cy="19" r="5.5"/>
+      <line x1="19" y1="6" x2="19" y2="10"/><line x1="19" y1="28" x2="19" y2="32"/>
+      <line x1="6" y1="19" x2="10" y2="19"/><line x1="28" y1="19" x2="32" y2="19"/>
+    </svg>
+  </div>
+  <div class="hero-name">GhostTrace</div>
+  <h1 class="hero-h1">The Operating System for OSINT</h1>
+  <div class="hero-sub">Intelligence Platform</div>
+  <p class="hero-desc">A unified control layer to investigate, analyze, and map any digital footprint with real-time intelligence across 214 sources.</p>
+  <div class="hero-btns">
+    <a href="#pricing" class="btn btn-primary btn-lg">Start for free</a>
+    <a href="#api" class="btn btn-ghost btn-lg">View Dashboard</a>
+  </div>
+  <div class="hero-overview">
+    <div class="hero-overview-glow"></div>
+    <div class="overview-placeholder">
+      <div class="ov-bar">
+        <span class="ov-dot ov-green ov-pulse"></span>
+        <span>ghosttrace.io/dashboard</span>
+        <span style="margin-left:auto;color:rgba(0,212,170,.6);">● live</span>
+      </div>
+      <div class="dash-row" style="width:90%;background:rgba(8,8,13,.8);border:1px solid rgba(236,236,244,.06);border-radius:8px;overflow:hidden">
+        <div class="dash-sidebar">
+          <div style="font-size:11px;color:rgba(236,236,244,.2);padding:4px 12px;margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase;">Navigation</div>
+          <div class="ds-item active">Dashboard</div>
+          <div class="ds-item">Email Scan</div>
+          <div class="ds-item">Username</div>
+          <div class="ds-item">Domain</div>
+          <div class="ds-item">Phone</div>
+          <div class="ds-item">API Keys</div>
+          <div class="ds-item">Reports</div>
+          <div class="ds-item">Settings</div>
+        </div>
+        <div class="dash-content">
+          <div class="dc-header">
+            <div class="dc-title">Intelligence Overview</div>
+            <div class="dc-badge">All systems live</div>
+          </div>
+          <div class="dc-cards">
+            <div class="dc-card"><div class="dc-card-n" data-count="214" data-sfx="+">0+</div><div class="dc-card-l">Sources active</div></div>
+            <div class="dc-card"><div class="dc-card-n" data-count="1240" data-sfx="+">0+</div><div class="dc-card-l">Scans today</div></div>
+            <div class="dc-card"><div class="dc-card-n">99.9<span style="font-size:14px;color:rgba(236,236,244,.4);font-weight:300">%</span></div><div class="dc-card-l">Uptime SLA</div></div>
+          </div>
+          <div class="dc-rows">
+            <div class="dc-row-item"><span class="dc-row-key">last_scan</span><span class="dc-row-val-g">target@domain.com · 7.3s</span></div>
+            <div class="dc-row-item"><span class="dc-row-key">breach_found</span><span class="dc-row-val-a">3 active databases</span></div>
+            <div class="dc-row-item"><span class="dc-row-key">github</span><span class="dc-row-val-p">@target_dev · 82 repos</span></div>
+            <div class="dc-row-item"><span class="dc-row-key">status</span><span class="dc-row-val-g">engine nominal</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll to explore <span class="sa"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2v10M3 8l4 4 4-4"/></svg></span></div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="mqt"></div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="eyebrow" data-r>Core Capabilities</div>
+    <h2 class="sh" data-r data-d="1">Uncompromising Performance</h2>
+    <p class="sp" data-r data-d="2">Everything your investigation workflow needs, engineered with precision and built for any scale.</p>
+    <div class="feat-grid">
+      <div class="feat-card" data-r data-d="1">
+        <div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M10 2L3 6v5c0 4 3.5 7 7 8 3.5-1 7-4 7-8V6L10 2z"/></svg></div>
+        <div class="feat-title">Breach Intelligence</div>
+        <div class="feat-desc">Cross-reference any email against live breach databases and dark web credential dumps in real time.</div>
+        <ul class="feat-list"><li>HaveIBeenPwned + 40 sources</li><li>Dark web credential scan</li><li>Exposure severity scoring</li></ul>
+      </div>
+      <div class="feat-card" data-r data-d="2">
+        <div class="feat-icon"><svg viewBox="0 0 20 20"><circle cx="10" cy="8" r="4"/><path d="M3 18c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg></div>
+        <div class="feat-title">Username Recon</div>
+        <div class="feat-desc">Cross-platform enumeration across 300+ sites simultaneously. Map full social footprint in seconds.</div>
+        <ul class="feat-list"><li>300+ platform coverage</li><li>Parallel enumeration engine</li><li>Profile data extraction</li></ul>
+      </div>
+      <div class="feat-card" data-r data-d="3">
+        <div class="feat-icon"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M2 10h3M15 10h3M10 2v3M10 15v3"/></svg></div>
+        <div class="feat-title">Domain Analysis</div>
+        <div class="feat-desc">WHOIS lookup, DNS enumeration, SSL certificate history, subdomain discovery, tech fingerprinting.</div>
+        <ul class="feat-list"><li>WHOIS & DNS records</li><li>Subdomain enumeration</li><li>SSL & tech fingerprinting</li></ul>
+      </div>
+      <div class="feat-card" data-r data-d="2">
+        <div class="feat-icon"><svg viewBox="0 0 20 20"><rect x="4" y="2" width="12" height="16" rx="2"/><path d="M7 7h6M7 11h6M7 15h3"/></svg></div>
+        <div class="feat-title">PDF Report Export</div>
+        <div class="feat-desc">One-click export of complete intelligence reports — timestamped, structured, ready for audit or client delivery.</div>
+        <ul class="feat-list"><li>Timestamped audit trail</li><li>White-label for agencies</li><li>Structured JSON export</li></ul>
+      </div>
+      <div class="feat-card" data-r data-d="3">
+        <div class="feat-icon"><svg viewBox="0 0 20 20"><rect x="5" y="2" width="10" height="16" rx="2"/><path d="M8 6h4M8 10h4M8 14h2"/></svg></div>
+        <div class="feat-title">Phone Lookup</div>
+        <div class="feat-desc">Carrier identification, VOIP detection, geographic region, and linked social profiles from any number.</div>
+        <ul class="feat-list"><li>Carrier & VOIP detection</li><li>Linked social profiles</li><li>Geographic resolution</li></ul>
+      </div>
+      <div class="feat-card" data-r data-d="4">
+        <div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M3 5l7-3 7 3v6c0 4-3.5 6-7 7-3.5-1-7-3-7-7V5z"/><path d="M7 10l2 2 4-4"/></svg></div>
+        <div class="feat-title">REST API Access</div>
+        <div class="feat-desc">Full API with SDKs for Python, Node.js, Go. Integrate into your SIEM, pipeline, or automation workflow.</div>
+        <ul class="feat-list"><li>Full REST API + SDKs</li><li>Webhook delivery</li><li>Bulk CSV scanning</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY LAYERS -->
+<section class="sec-section section-alt" id="how">
+  <div class="wrap">
+    <div class="sec-inner">
+      <div>
+        <div class="eyebrow left-align" data-r>Defense in Depth</div>
+        <h2 class="sh left-align" style="max-width:400px" data-r data-d="1">Multi-Layer Intelligence Architecture</h2>
+        <p class="sp left-align" data-r data-d="2">GhostTrace employs a three-layer intelligence pipeline to aggregate, enrich, and deliver complete target profiles before any manual search could complete.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px" data-r data-d="3">
+          <div style="display:flex;align-items:center;gap:11px;font-size:14px;color:rgba(236,236,244,.5);font-weight:300"><div style="width:7px;height:7px;background:#7C5CFC;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px rgba(124,92,252,.7)"></div>214 sources queried in parallel — not sequentially</div>
+          <div style="display:flex;align-items:center;gap:11px;font-size:14px;color:rgba(236,236,244,.5);font-weight:300"><div style="width:7px;height:7px;background:#00D4AA;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px rgba(0,212,170,.6)"></div>AI enrichment layer correlates and scores signals</div>
+          <div style="display:flex;align-items:center;gap:11px;font-size:14px;color:rgba(236,236,244,.5);font-weight:300"><div style="width:7px;height:7px;background:#F5A623;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px rgba(245,166,35,.6)"></div>Structured output ready for SIEM ingestion</div>
+        </div>
+      </div>
+      <div class="sec-layers" data-r data-d="2">
+        <div class="sec-layer sec-layer-1">
+          <span class="sec-layer-badge slb-1">App Layer</span>
+          <div><div class="sec-layer-name">Report Output</div><div class="sec-layer-desc">JSON, PDF, webhook delivery, SIEM-ready format</div></div>
+        </div>
+        <div class="sec-connector"><svg width="2" height="24" viewBox="0 0 2 24"><line x1="1" y1="0" x2="1" y2="24" stroke="rgba(124,92,252,.35)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+        <div class="sec-layer sec-layer-2">
+          <span class="sec-layer-badge slb-2">Logic Layer</span>
+          <div><div class="sec-layer-name">AI Enrichment Engine</div><div class="sec-layer-desc">Signal correlation, de-duplication, context scoring</div></div>
+        </div>
+        <div class="sec-connector"><svg width="2" height="24" viewBox="0 0 2 24"><line x1="1" y1="0" x2="1" y2="24" stroke="rgba(124,92,252,.35)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+        <div class="sec-layer sec-layer-3">
+          <span class="sec-layer-badge slb-3">Core Engine</span>
+          <div><div class="sec-layer-name">Source Collection</div><div class="sec-layer-desc">214 APIs queried in parallel — 48 concurrent workers</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOMATION -->
+<section class="auto-section" id="api">
+  <div class="wrap">
+    <div class="auto-inner">
+      <div>
+        <div class="eyebrow left-align" data-r>Server Management</div>
+        <h2 class="sh left-align" style="max-width:380px" data-r data-d="1">Automate Everything</h2>
+        <p class="sp left-align" data-r data-d="2">Real-time scan outputs, automated report delivery, and webhook triggers — GhostTrace integrates directly into your existing security workflow.</p>
+        <a href="#" class="btn btn-primary" data-r data-d="3">View API Docs</a>
+      </div>
+      <div class="auto-cards" data-r data-d="2">
+        <div class="auto-card" id="live-card">
+          <div class="ac-head"><span class="ac-title">live_scan — target@domain.com</span><span class="ac-badge acb-ok">complete</span></div>
+          <div class="ac-body">
+            <div class="ac-row"><span class="ac-key">breach_count</span><span class="ac-va" id="lc-breach">3 active</span></div>
+            <div class="ac-row"><span class="ac-key">github</span><span class="ac-vg">@target_dev · found</span></div>
+            <div class="ac-row"><span class="ac-key">linkedin</span><span class="ac-vg">Lead Engineer · verified</span></div>
+            <div class="ac-row"><span class="ac-key">sources_hit</span><span class="ac-v" id="lc-src">214</span></div>
+            <div class="ac-row"><span class="ac-key">scan_time</span><span class="ac-vp" id="lc-time">7.3s</span></div>
+          </div>
+        </div>
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-title">event — automod.intercepted</span><span class="ac-badge acb-warn">action taken</span></div>
+          <div class="ac-body">
+            <div class="ac-row"><span class="ac-key">type</span><span class="ac-vp">credential.exposure</span></div>
+            <div class="ac-row"><span class="ac-key">source</span><span class="ac-va">Pastebin leak detected</span></div>
+            <div class="ac-row"><span class="ac-key">action</span><span class="ac-vg">alert delivered · webhook fired</span></div>
+            <div class="ac-row"><span class="ac-key">latency</span><span class="ac-v">48ms</span></div>
+          </div>
+        </div>
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-title">webhook — report_delivered</span><span class="ac-badge acb-ok">200 OK</span></div>
+          <div class="ac-body">
+            <div class="ac-row"><span class="ac-key">event</span><span class="ac-vp">scan.complete</span></div>
+            <div class="ac-row"><span class="ac-key">scan_id</span><span class="ac-v">sc_29xAb7zQ</span></div>
+            <div class="ac-row"><span class="ac-key">report_url</span><span class="ac-vg">PDF ready · 214 sources</span></div>
+            <div class="ac-row"><span class="ac-key">response</span><span class="ac-vg">200 OK · 48ms</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIUM -->
+<section class="premium-section section" id="pricing">
+  <div class="premium-glow"></div>
+  <div class="wrap">
+    <div class="eyebrow" data-r>GhostTrace Prime</div>
+    <h2 class="sh" data-r data-d="1">Unlock Infinite Potential</h2>
+    <p class="sp" data-r data-d="2">Experience Ultimate Intelligence, Performance & Security</p>
+    <div class="premium-inner">
+      <div class="prem-cards" data-r data-d="1">
+        <div class="prem-card">
+          <div class="prem-card-title">5X Higher Limits</div>
+          <div class="prem-tags">
+            <span class="pt">500 scans / month</span>
+            <span class="pt">Bulk CSV upload</span>
+            <span class="pt">300+ platforms</span>
+            <span class="pt">Parallel batches</span>
+          </div>
+        </div>
+        <div class="prem-card">
+          <div class="prem-card-title">Full API Access</div>
+          <div class="prem-tags">
+            <span class="pt">REST API 5k req/mo</span>
+            <span class="pt">Webhook delivery</span>
+            <span class="pt">Python / Node SDK</span>
+            <span class="pt">SIEM integration</span>
+          </div>
+        </div>
+        <div class="prem-card">
+          <div class="prem-card-title">Agency Controls</div>
+          <div class="prem-tags">
+            <span class="pt">White-label PDF</span>
+            <span class="pt">Custom branding</span>
+            <span class="pt">Team seats</span>
+            <span class="pt">Priority support</span>
+          </div>
+        </div>
+      </div>
+      <div class="prem-cta" data-r data-d="2">
+        <div class="pc-eye">GhostTrace Prime</div>
+        <div class="pc-price-wrap"><div class="pc-price"><sup>$</sup>19</div></div>
+        <div class="pc-cycle">per month</div>
+        <div class="pc-desc">Upgrade your intelligence workflow with unlimited capacity, full API access, and white-label reporting for your entire team.</div>
+        <div class="pc-feat-tags">
+          <span class="pft">Priority Support</span>
+          <span class="pft">Instant Access</span>
+          <span class="pft">Full API</span>
+          <span class="pft">White-label</span>
+        </div>
+        <a href="#" class="btn btn-primary btn-xl" style="width:100%;justify-content:center;">Upgrade to GhostTrace Prime</a>
+        <a href="#" class="btn btn-outline-purple btn-xl" style="width:100%;justify-content:center;margin-top:10px;">Upgrade to GhostTrace Prime</a>
+        <div class="pc-badges">
+          <span class="pc-badge-pill">Priority Support</span>
+          <span class="pc-badge-pill">Instant Access</span>
+          <span class="pc-badge-pill">Exclusive Badge</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="why-section">
+  <div class="wrap">
+    <div class="eyebrow" data-r>The GhostTrace Advantage</div>
+    <h2 class="sh" data-r data-d="1">Why Choose GhostTrace?</h2>
+    <p class="sp" data-r data-d="2">The ultimate intelligence infrastructure for standard-setting security teams. Ditch the guesswork and upgrade to production-ready tools.</p>
+    <div class="why-grid">
+      <div class="why-card" data-r data-d="1">
+        <div class="why-icon"><svg viewBox="0 0 17 17"><circle cx="7.5" cy="7.5" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg></div>
+        <div class="why-title">Dashboard Control</div>
+        <div class="why-desc">Configure everything visually through an intuitive real-time control panel with live scan monitoring.</div>
+      </div>
+      <div class="why-card" data-r data-d="2">
+        <div class="why-icon"><svg viewBox="0 0 17 17"><path d="M2 4l6-2 6 2v5c0 3.5-2.5 5-6 5.5-3.5-.5-6-2-6-5.5V4z"/></svg></div>
+        <div class="why-title">Multi-Layer Protection</div>
+        <div class="why-desc">Collection, enrichment, and output layers operate together seamlessly across 214 sources.</div>
+      </div>
+      <div class="why-card" data-r data-d="3">
+        <div class="why-icon"><svg viewBox="0 0 17 17"><path d="M2 13l4-4 3 3 6-8"/></svg></div>
+        <div class="why-title">Intelligent Enrichment</div>
+        <div class="why-desc">AI correlation layer scores and de-duplicates signals across all sources for clean, actionable output.</div>
+      </div>
+      <div class="why-card" data-r data-d="2">
+        <div class="why-icon"><svg viewBox="0 0 17 17"><rect x="2" y="2" width="13" height="13" rx="2"/><path d="M5.5 8.5h5M8.5 5.5v5"/></svg></div>
+        <div class="why-title">Effortless Integration</div>
+        <div class="why-desc">Full REST API, webhooks, and SDKs. Drop into any pipeline or SIEM in minutes with zero configuration.</div>
+      </div>
+      <div class="why-card" data-r data-d="3">
+        <div class="why-icon"><svg viewBox="0 0 17 17"><circle cx="8.5" cy="8.5" r="6"/><path d="M8.5 5.5v3l2 2"/></svg></div>
+        <div class="why-title">Powerful Utilities</div>
+        <div class="why-desc">Email, username, domain, phone, PDF export, bulk scan — every surface covered from one platform.</div>
+      </div>
+      <div class="why-card" data-r data-d="4">
+        <div class="why-icon"><svg viewBox="0 0 17 17"><path d="M8.5 2L10 5.5l4 .5-3 2.5.5 4-3-1.5-3 1.5.5-4-3-2.5 4-.5z"/></svg></div>
+        <div class="why-title">Setup in Minutes</div>
+        <div class="why-desc">Deploy GhostTrace with production-ready intelligence without complex setup or configuration.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section">
+  <div class="cta-bg-glow"></div>
+  <div class="wrap">
+    <div class="cta-avatar">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="15" cy="15" r="10"/><line x1="22" y1="22" x2="30" y2="30"/>
+        <circle cx="15" cy="15" r="4"/>
+      </svg>
+    </div>
+    <h2 class="cta-h">Secure your intelligence.<br>In minutes.</h2>
+    <p class="cta-p">Join thousands of security researchers and professionals trusting GhostTrace for their recon, investigation, and audit workflows.</p>
+    <div class="cta-btns">
+      <a href="#pricing" class="btn btn-primary btn-xl">Start for free</a>
+      <a href="#" class="btn btn-ghost btn-xl">Open Dashboard</a>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item"><span class="stat-n" data-count="2800" data-sfx="+">0</span><div class="stat-l">Active Users</div></div>
+      <div class="stat-item"><span class="stat-n" data-count="50000" data-sfx="+">0</span><div class="stat-l">Total Scans</div></div>
+      <div class="stat-item"><span class="stat-n">99.9<span style="font-size:22px;color:rgba(236,236,244,.35);font-weight:300">%</span></span><div class="stat-l">System Uptime</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo-row">
+          <div class="flr-icon"><svg viewBox="0 0 13 13" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><circle cx="5.5" cy="5.5" r="3.5"/><line x1="8" y1="8" x2="11.5" y2="11.5"/></svg></div>
+          GhostTrace
+        </div>
+        <div class="footer-desc">The ultimate multipurpose OSINT platform engineered for modern security teams with advanced features and reliable performance.</div>
+        <div class="footer-contact"><div>support@ghosttrace.io</div><div>+91 00000 00000</div></div>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <div class="footer-col-links">
+          <a href="#">Dashboard</a><a href="#">Get started</a><a href="#">Documentation</a>
+          <a href="#">Commands</a><a href="#">Pricing</a><a href="#">Support</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <div class="footer-col-links">
+          <a href="#">Contact Us</a><a href="#">Terms of Use</a><a href="#">Privacy Policy</a>
+          <a href="#">Refund Policy</a><a href="#">GDPR</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Statistics</div>
+        <div style="font-size:13px;color:rgba(236,236,244,.3);line-height:2;font-weight:300;font-family:'JetBrains Mono',monospace;">
+          <div>Users: <span style="color:rgba(236,236,244,.5)" data-count="2800" data-sfx="+">0+</span></div>
+          <div>Scans: <span style="color:rgba(236,236,244,.5)" data-count="50000" data-sfx="+">0+</span></div>
+          <div>Uptime: <span style="color:#00D4AA">99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 GhostTrace Development. All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#">Terms</a><a href="#">Privacy</a><a href="#">Disclaimer</a><a href="#">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function buildMarquee(){
+  const items=["Email Recon","Username Scan","Domain Intel","Breach Detection","Phone Lookup","API Access","PDF Export","Bulk Scanning","WHOIS Lookup","Subdomain Enum","SSL Analysis","Tech Fingerprint","Dark Web Check","Social Mapping","Carrier Detection","SIEM Export"]
+  const t=document.getElementById("mqt")
+  if(!t)return
+  ;[...items,...items].forEach(s=>{
+    const d=document.createElement("div")
+    d.className="mq-item"
+    d.innerHTML=`<span class="mq-dot"></span>${s}`
+    t.appendChild(d)
+  })
+}
+
+function counters(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting)return
+      io.unobserve(e.target)
+      const el=e.target
+      const target=parseFloat(el.dataset.count)
+      const sfx=el.dataset.sfx||""
+      const dur=1600,t0=performance.now()
+      function frame(now){
+        const p=Math.min((now-t0)/dur,1)
+        const ease=1-Math.pow(1-p,3)
+        el.textContent=Math.floor(ease*target).toLocaleString()+sfx
+        if(p<1)requestAnimationFrame(frame)
+        else el.textContent=target.toLocaleString()+sfx
+      }
+      requestAnimationFrame(frame)
+    })
+  },{threshold:.4})
+  document.querySelectorAll("[data-count]").forEach(el=>io.observe(el))
+}
+
+function reveal(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
+    })
+  },{threshold:.08})
+  document.querySelectorAll("[data-r]").forEach(el=>io.observe(el))
+}
+
+function navScroll(){
+  const nav=document.getElementById("nav")
+  if(!nav)return
+  window.addEventListener("scroll",()=>{
+    nav.style.background=window.scrollY>30?"rgba(5,5,7,.97)":"rgba(5,5,7,.82)"
+  },{passive:true})
+}
+
+function liveUpdate(){
+  const times=["6.1s","7.3s","5.8s","8.2s","6.7s","7.1s"]
+  const srcs=["212","214","211","214","213","214"]
+  const breaches=["2 active","3 active","1 active","4 active","2 active","3 active"]
+  let i=0
+  const te=document.getElementById("lc-time")
+  const se=document.getElementById("lc-src")
+  const be=document.getElementById("lc-breach")
+  if(te)te.style.transition="opacity .2s"
+  if(se)se.style.transition="opacity .2s"
+  if(be)be.style.transition="opacity .2s"
+  setInterval(()=>{
+    i=(i+1)%times.length
+    ;[te,se,be].forEach(el=>{if(el)el.style.opacity="0"})
+    setTimeout(()=>{
+      if(te)te.textContent=times[i]
+      if(se)se.textContent=srcs[i]
+      if(be)be.textContent=breaches[i]
+      ;[te,se,be].forEach(el=>{if(el)el.style.opacity="1"})
+    },200)
+  },3000)
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  buildMarquee()
+  counters()
+  reveal()
+  navScroll()
+  liveUpdate()
+})
+</script>
+</body>
+</html>
